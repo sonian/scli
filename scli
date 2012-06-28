@@ -1,0 +1,57 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'mixlib/cli'
+require 'fog'
+require 'colored'
+require 'terminal-table'
+require './lib/generic'
+
+class MyCLI
+  include Mixlib::CLI
+
+  option :config_file,
+    :short => "-c CONFIG",
+    :long  => "--config CONFIG",
+    :default => '~/.scli/config.rb',
+    :description => "The configuration file to use"
+
+  option :instance_id,
+    :short => "-i INSTANCE",
+    :long => "--instance-id INSTANCE",
+    :description => "Instance ID to use"
+
+  option :help,
+    :short => "-h",
+    :long => "--help",
+    :description => "SCLI Help",
+    :on => :tail,
+    :boolean => true,
+    :show_options => true,
+    :exit => 0
+
+end
+
+cli = MyCLI.new
+cli.parse_options
+
+module Scli
+  def self.options
+    cli = MyCLI.new
+    cli.parse_options
+    cli.config.merge!(read_config(File.expand_path(cli.config[:config_file])))
+  end
+end
+
+help_rows = []
+help_rows << ["din", "describe-instances, describe-instance", "Instance ID (Opt)", "scli din, scli din 123456"]
+help_table = Terminal::Table.new :title => "Help", :headings => ["Command", "Aliases", "Arguments", "Examples"], :rows => help_rows
+
+case ARGV[0]
+when 'din', 'describe-instance', 'describe-instances'
+  require './lib/din'
+when 'help'
+  puts help_table
+else
+  puts help_table
+end
