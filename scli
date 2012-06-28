@@ -21,6 +21,11 @@ class MyCLI
     :long => "--instance-id INSTANCE",
     :description => "Instance ID to use"
 
+  option :volume_id,
+    :short => "-v VOLUME",
+    :long => "--volume-id VOLUME",
+    :description => "Volume ID to use"
+
   option :help,
     :short => "-h",
     :long => "--help",
@@ -45,13 +50,28 @@ end
 
 help_rows = []
 help_rows << ["din", "describe-instances, describe-instance", "Instance ID (Opt)", "scli din, scli din 123456"]
+help_rows << ["reboot", "", "Instance ID (Req)", "scli reboot 123456"]
+help_rows << ["tin", "terminate-instance", "Instance ID (Req)", "scli tin 123456, scli terminate-instance 123456"]
+help_rows << ["dvol", "describe-volume, describe-volumes", "Volume ID (Opt)", "scli dvol 23456, scli describe-volume 23456"]
 help_table = Terminal::Table.new :title => "Help", :headings => ["Command", "Aliases", "Arguments", "Examples"], :rows => help_rows
 
-case ARGV[0]
-when 'din', 'describe-instance', 'describe-instances'
-  require './lib/din'
-when 'help'
-  puts help_table
-else
-  puts help_table
+begin
+  case ARGV[0]
+  when 'describe-instance', 'describe-instances', 'din'
+    require './lib/describe-instance'
+  when 'reboot'
+    require './lib/reboot'
+  when 'terminate-instance', 'tin'
+    require './lib/terminate-instance'
+  when 'describe-volume', 'describe-volumes', 'dvol'
+    require './lib/describe-volume'
+  when 'help'
+    puts help_table
+  else
+    puts help_table
+  end
+rescue Excon::Errors::InternalServerError
+  puts "Got an internal server error while trying to talk to IBM, Retry"
+rescue Excon::Errors::PreconditionFailed => e
+  puts "A precondition failed while trying to do our API Request: #{e.response.body}"
 end
