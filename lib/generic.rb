@@ -100,7 +100,7 @@ module Scli
   def self.print_volume(volume)
     table_to_print = []
     table_to_print << [volume.id, volume.name, format_size(volume.size), format_instance_id(volume.instance_id), volume.owner, volume.format, format_location(volume.location_id), volume.created_at, format_state(volume.state)]
-    table = Terminal::Table.new :title => "Volume", :headings => ["id".green, "name".green, "size".green, "instance_id".green, "owner".green, "format".green, "location_id".green, "created_at".green, "state".green], :rows => table_to_print
+    table = Terminal::Table.new :title => "Volume".cyan, :headings => ["id".green, "name".green, "size".green, "instance_id".green, "owner".green, "format".green, "location_id".green, "created_at".green, "state".green], :rows => table_to_print
     puts table
   end
 
@@ -111,7 +111,7 @@ module Scli
       table_to_print << [vol.id, vol.name, format_size(vol.size), format_instance_id(vol.instance_id), format_owner(vol.owner), vol.format, format_location(vol.location_id), vol.created_at, format_state(vol.state)]
       total_vol_size += vol.size.to_i
     end
-    table = Terminal::Table.new :title => "Volumes (#{volumes.count})", :headings => ["id".green, "name".green, "size".green, "instance_id".green, "owner".green, "format".green, "location_id".green, "created_at".green, "state".green], :rows => table_to_print
+    table = Terminal::Table.new :title => "Volumes (#{volumes.count})".cyan, :headings => ["id".green, "name".green, "size".green, "instance_id".green, "owner".green, "format".green, "location_id".green, "created_at".green, "state".green], :rows => table_to_print
     puts table
     puts "Total #{(total_vol_size.to_i / 1024.0).round(2)}Tb of storage"
   end
@@ -128,7 +128,7 @@ module Scli
     servers.each do |server|
       table_to_print << [server.id, server.name, format_ip(server.ip), format_type(server.instance_type), format_owner(server.owner), format_location(server.location_id), server.launched_at, format_state(server.state)]
     end
-    table = Terminal::Table.new :title => "Servers (#{servers.count})".red, :headings => ["id".green, "name".green, "ip".green, "owner".green, "location_id".green, "launched_at".green, "state".green], :rows => table_to_print
+    table = Terminal::Table.new :title => "Servers (#{servers.count})".cyan, :headings => ["id".green, "name".green, "ip".green, "owner".green, "location_id".green, "launched_at".green, "state".green], :rows => table_to_print
     puts table
   end
 

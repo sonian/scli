@@ -53,6 +53,9 @@ help_rows << ["din", "describe-instances, describe-instance", "Instance ID (Opt)
 help_rows << ["reboot", "", "Instance ID (Req)", "scli reboot 123456"]
 help_rows << ["tin", "terminate-instance", "Instance ID (Req)", "scli tin 123456, scli terminate-instance 123456"]
 help_rows << ["dvol", "describe-volume, describe-volumes", "Volume ID (Opt)", "scli dvol 23456, scli describe-volume 23456"]
+help_rows << ["attvol", "attach-volume", "Volume ID (Req), Instance ID (Req)", "scli attvol -i 123456 -v 23456"]
+help_rows << ["detvol", "detach-volume", "Volume ID (Req), Instance ID (Req)", "scli detvol -i 123456 -v 23456"]
+help_rows << ["delvol", "delete-volume,terminate-volume", "Volume ID (Req)", "scli delvol -v 23456, scli delvol 23456"]
 help_table = Terminal::Table.new :title => "Help", :headings => ["Command", "Aliases", "Arguments", "Examples"], :rows => help_rows
 
 begin
@@ -65,6 +68,12 @@ begin
     require './lib/terminate-instance'
   when 'describe-volume', 'describe-volumes', 'dvol'
     require './lib/describe-volume'
+  when 'attvol', 'attach-volume'
+    require './lib/attach-volume'
+  when 'detvol', 'detach-volume'
+    require './lib/detach-volume'
+  when 'delvol', 'delete-volume', 'terminate-volume'
+    require './lib/terminate-volume'
   when 'help'
     puts help_table
   else
@@ -74,4 +83,8 @@ rescue Excon::Errors::InternalServerError
   puts "Got an internal server error while trying to talk to IBM, Retry"
 rescue Excon::Errors::PreconditionFailed => e
   puts "A precondition failed while trying to do our API Request: #{e.response.body}"
+rescue Excon::Errors::SocketError => e
+  puts "Could not connect to IBM: #{e}"
+rescue Excon::Errors::Unauthorized => e
+  puts "You were not authorized to access a resource, Are you sure its owned by the account in your config file? -- #{e.response.body}"
 end
