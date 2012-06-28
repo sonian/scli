@@ -23,6 +23,24 @@ module Scli
     end
   end
 
+  def self.config_file_exists?(config_file_path)
+    File.exists?(File.expand_path(config_file_path))
+  end
+
+  def self.generate_config_file(config_file_path)
+    puts "Config file #{config_file_path} does not exist, let's create it."
+    puts "What is your IBM SC Username?"
+    ibm_username = $stdin.gets
+    puts "What is your IBM SC Password?"
+    ibm_password = $stdin.gets
+    Dir.mkdir(File.expand_path(File.dirname(config_file_path))) unless File.exists?(File.expand_path(File.dirname(config_file_path)))
+    ibm_config = File.open(File.expand_path(config_file_path), "w")
+    ibm_config.puts "ibm_username #{ibm_username}"
+    ibm_config.puts "ibm_password #{ibm_password}"
+    ibm_config.close
+    puts "Config file written."
+  end
+
   def self.is_volume_id?(volume_id)
     int_volume_id = volume_id.to_i.to_s
     if int_volume_id.size >= 5

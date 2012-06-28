@@ -48,6 +48,8 @@ module Scli
   end
 end
 
+Scli.generate_config_file(cli.config[:config_file]) unless Scli.config_file_exists?(cli.config[:config_file])
+
 help_rows = []
 help_rows << ["din", "describe-instances, describe-instance", "Instance ID (Opt)", "scli din, scli din 123456"]
 help_rows << ["reboot", "", "Instance ID (Req)", "scli reboot 123456"]
