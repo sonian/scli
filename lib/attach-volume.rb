@@ -15,9 +15,9 @@ module Scli
         puts "Could not find volume: #{volume_id}"
       else
         if server.attach(volume_id.to_i) # Note: attach() takes a string, not an object
-          print_volume(volume)
+          print_volumes(volume)
           puts "Is being attached to instance:".red
-          print_server(server)
+          print_servers(server)
         else
           puts "Volume could not be attached for some reason..."
         end

@@ -5,6 +5,7 @@ require 'mixlib/cli'
 require 'fog'
 require 'colored'
 require 'terminal-table'
+require './lib/formatters'
 require './lib/generic'
 
 class MyCLI
@@ -16,6 +17,11 @@ class MyCLI
     :default => '~/.scli/config.rb',
     :description => "The configuration file to use"
 
+  option :address_id,
+    :short => "-a ADDRESS",
+    :long => "--address-id ADDRESS",
+    :description => "Address ID to use"
+
   option :instance_id,
     :short => "-i INSTANCE",
     :long => "--instance-id INSTANCE",
@@ -25,6 +31,21 @@ class MyCLI
     :short => "-v VOLUME",
     :long => "--volume-id VOLUME",
     :description => "Volume ID to use"
+
+  option :image_id,
+    :short => "-m IMAGE",
+    :long => "--image-id IMAGE",
+    :description => "Image ID to use"
+
+  option :key_id,
+    :short => "-k IMAGE",
+    :long => "--key-id KEY",
+    :description => "Key ID to use"
+
+  option :vlan_id,
+    :short => "-l VLAN",
+    :long => "--vlan-id VLAN",
+    :description => "Vlan ID to use"
 
   option :help,
     :short => "-h",
@@ -58,6 +79,10 @@ help_rows << ["dvol", "describe-volume, describe-volumes", "Volume ID (Opt)", "s
 help_rows << ["attvol", "attach-volume", "Volume ID (Req), Instance ID (Req)", "scli attvol -i 123456 -v 23456"]
 help_rows << ["detvol", "detach-volume", "Volume ID (Req), Instance ID (Req)", "scli detvol -i 123456 -v 23456"]
 help_rows << ["delvol", "delete-volume,terminate-volume", "Volume ID (Req)", "scli delvol -v 23456, scli delvol 23456"]
+help_rows << ["dim", "describe-image, describe-images", "Image ID (Opt)", "scli dim -m 34567, scli describe-image 34567"]
+help_rows << ["dkey", "describe-key, describe-keys", "Key ID (Opt)", "scli dkey -k 345678, scli describe-key 345678"]
+help_rows << ["dvlan", "describe-vlan, describe-vlans", "Vlan ID (Opt)", "scli dvlan -v 345, scli describe-vlan 345"]
+help_rows << ["dadd", "describe-address, describe-addresses", "Address ID (Opt)", "scli dadd -a 345313, scli describe-address 345313"]
 help_table = Terminal::Table.new :title => "Help", :headings => ["Command", "Aliases", "Arguments", "Examples"], :rows => help_rows
 
 begin
@@ -76,8 +101,17 @@ begin
     require './lib/detach-volume'
   when 'delvol', 'delete-volume', 'terminate-volume'
     require './lib/terminate-volume'
+  when 'dim', 'describe-image', 'describe-images'
+    require './lib/describe-image'
+  when 'dkey', 'describe-keys', 'describe-key'
+    require './lib/describe-key'
+  when 'dvlan', 'describe-vlans', 'describe-vlan'
+    require './lib/describe-vlan'
+  when 'dadd', 'describe-addresses', 'describe-address'
+    require './lib/describe-address'
   when 'help'
     puts help_table
+    puts "Run scli -h to get command line arguments"
   else
     puts help_table
   end
@@ -89,4 +123,11 @@ rescue Excon::Errors::SocketError => e
   puts "Could not connect to IBM: #{e}"
 rescue Excon::Errors::Unauthorized => e
   puts "You were not authorized to access a resource, Are you sure its owned by the account in your config file? -- #{e.response.body}"
+rescue Exception => e
+  if e.methods.include?(:response)
+    puts "Fog API Took an exception while speaking to IBM: #{e.response.body}"
+  else
+    puts "Took an exception, You probably put an invalid instance, volume or address id in as a command line argument, Check to make sure it really exists and retry."
+    puts "#{e.backtrace.join("\n")} -- #{e.message}"
+  end
 end

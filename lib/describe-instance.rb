@@ -4,10 +4,10 @@ module Scli
     cli.parse_options
     instance_id = cli.config[:instance_id] || ARGV[1]
     if instance_id.nil?
-      pretty_print(Scli::Compute.new.servers)
+      print_servers(Scli::Compute.new.servers)
     else
       if is_instance_id?(instance_id)
-        pretty_print(Scli::Compute.new.servers.get(instance_id))
+        print_servers(Scli::Compute.new.servers.get(instance_id))
       else
         puts "Instance id provided is invalid"
       end

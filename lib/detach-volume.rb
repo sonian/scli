@@ -15,9 +15,9 @@ module Scli
         puts "Could not find volume: #{volume_id}"
       else
         if server.detach(volume_id) # Note: detach() takes a string, not an object
-          print_volume(volume)
+          print_volumes(volume)
           puts "Is being detached from instance:".red
-          print_server(server)
+          print_servers(server)
         else
           puts "Volume could not be detached for some reason..."
         end
