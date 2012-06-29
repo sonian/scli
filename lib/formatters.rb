@@ -38,6 +38,14 @@ module Scli
     (description.size > 14) ? "#{description[0..12]}.." : description
   end
 
+  def self.format_capabilities(capable, full = false)
+    capabilities = capable.collect do |cap|
+      "#{cap['id']} => #{cap['entries']}" unless cap['entries'].size == 0 || cap.nil?
+    end
+    cap_print = capabilities.reject{|cap| cap.nil?}.join(",")
+    full ? cap_print : "#{cap_print[0..12]}.."
+  end
+
   def self.format_ip(ip)
     return "NA".red if ip.nil? || ip == ""
     first_octet = ip.split(".").first
@@ -101,6 +109,8 @@ module Scli
         format_state(object.send(data))
       when /supported_instance_types/
         format_image_instance_types(object.send(data))
+      when /capabilities/
+        single ? format_capabilities(object.send(data), true) : format_capabilities(object.send(data))
       when /default/
         format_is_default?(object.send(data))
       when /owner/

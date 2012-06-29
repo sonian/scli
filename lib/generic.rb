@@ -41,26 +41,6 @@ module Scli
     puts "Config file written."
   end
 
-  def self.is_address_id?(address_id)
-    address_id.to_i.to_s.size >= 6
-  end
-
-  def self.is_volume_id?(volume_id)
-    volume_id.to_i.to_s.size >= 5
-  end
-
-  def self.is_vlan_id?(vlan_id)
-    vlan_id.to_i.to_s.size == 3
-  end
-
-  def self.is_image_id?(image_id)
-    image_id.to_i.to_s.size >= 8
-  end
-
-  def self.is_instance_id?(instance_id)
-    instance_id.to_i.to_s.size >= 6
-  end
-
   def self.print_object(title, objects, data_to_print, options = {})
     table_to_print = []
     if objects.methods.include?(:each) # Its not a single object
@@ -77,7 +57,7 @@ module Scli
   end
 
   def self.print_volumes(volumes)
-    print_object("Volumes", volumes, [:id, :name, :size, :instance_id, :owner, :format, :location_id, :created_at, :state])
+    print_object("Volumes", volumes, [:id, :name, :size, :instance_id, :owner, :format, :location_id, :offering_id, :created_at, :state])
     if volumes.class.to_s == "Fog::Storage::IBM::Volumes"
       total_vol_size = 0
       volumes.each do |vol|

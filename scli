@@ -5,6 +5,7 @@ require 'mixlib/cli'
 require 'fog'
 require 'colored'
 require 'terminal-table'
+require './lib/validators'
 require './lib/formatters'
 require './lib/generic'
 
@@ -12,7 +13,7 @@ class MyCLI
   include Mixlib::CLI
 
   option :config_file,
-    :short => "-c CONFIG",
+    :short => "-C CONFIG",
     :long  => "--config CONFIG",
     :default => '~/.scli/config.rb',
     :description => "The configuration file to use"
@@ -42,10 +43,35 @@ class MyCLI
     :long => "--key-id KEY",
     :description => "Key ID to use"
 
+  option :offering_id,
+    :short => "-o OFFERING",
+    :long => "--offering-id OFFERING",
+    :description => "Offering ID to use"
+
   option :vlan_id,
     :short => "-l VLAN",
     :long => "--vlan-id VLAN",
     :description => "Vlan ID to use"
+
+  option :location_id,
+    :short => "-c LOCATION",
+    :long => "--location-id LOCATION",
+    :description => "Location ID to use"
+
+  option :name,
+    :short => "-n NAME",
+    :long => "--name NAME",
+    :description => "Name to use"
+
+  option :size,
+    :short => "-s SIZE",
+    :long => "--size SIZE",
+    :description => "Size to use"
+
+  option :format,
+    :short => "-f FORMAT",
+    :long => "--format FORMAT",
+    :description => "Format to use (ext3, raw)"
 
   option :help,
     :short => "-h",
@@ -72,17 +98,22 @@ end
 Scli.generate_config_file(cli.config[:config_file]) unless Scli.config_file_exists?(cli.config[:config_file])
 
 help_rows = []
-help_rows << ["din", "describe-instances, describe-instance", "Instance ID (Opt)", "scli din, scli din 123456"]
-help_rows << ["reboot", "", "Instance ID (Req)", "scli reboot 123456"]
-help_rows << ["tin", "terminate-instance", "Instance ID (Req)", "scli tin 123456, scli terminate-instance 123456"]
-help_rows << ["dvol", "describe-volume, describe-volumes", "Volume ID (Opt)", "scli dvol 23456, scli describe-volume 23456"]
-help_rows << ["attvol", "attach-volume", "Volume ID (Req), Instance ID (Req)", "scli attvol -i 123456 -v 23456"]
-help_rows << ["detvol", "detach-volume", "Volume ID (Req), Instance ID (Req)", "scli detvol -i 123456 -v 23456"]
-help_rows << ["delvol", "delete-volume,terminate-volume", "Volume ID (Req)", "scli delvol -v 23456, scli delvol 23456"]
-help_rows << ["dim", "describe-image, describe-images", "Image ID (Opt)", "scli dim -m 34567, scli describe-image 34567"]
-help_rows << ["dkey", "describe-key, describe-keys", "Key ID (Opt)", "scli dkey -k 345678, scli describe-key 345678"]
-help_rows << ["dvlan", "describe-vlan, describe-vlans", "Vlan ID (Opt)", "scli dvlan -v 345, scli describe-vlan 345"]
-help_rows << ["dadd", "describe-address, describe-addresses", "Address ID (Opt)", "scli dadd -a 345313, scli describe-address 345313"]
+help_rows << ["din", "describe-instances, describe-instance", "Instance ID (Opt -i)", "scli din, scli din 123456"]
+help_rows << ["reboot", "", "Instance ID (Req -i)", "scli reboot 123456"]
+help_rows << ["tin", "terminate-instance", "Instance ID (Req -i)", "scli tin 123456"]
+help_rows << ["dvol", "describe-volume, describe-volumes", "Volume ID (Opt -v)", "scli dvol 23456"]
+help_rows << ["dvoloff", "describe-volume-offerings", "", "scli dvoloff"]
+help_rows << ["attvol", "attach-volume", "Volume ID (Req -v), Instance ID (Req -i)", "scli attvol -i 123456 -v 23456"]
+help_rows << ["cvol", "create-volume", "Name (Req -n), Offering ID (Req -o), Format (Req -f), Location ID (Req -c), Size (Req -s)", "scli cvol"]
+help_rows << ["detvol", "detach-volume", "Volume ID (Req -v), Instance ID (Req -i)", "scli detvol -i 123456 -v 23456"]
+help_rows << ["delvol", "delete-volume,terminate-volume", "Volume ID (Req -v)", "scli delvol -v 23456, scli delvol 23456"]
+help_rows << ["dim", "describe-image, describe-images", "Image ID (Opt -m)", "scli dim -m 34567, scli describe-image 34567"]
+help_rows << ["dkey", "describe-key, describe-keys", "Key ID (Opt -k)", "scli dkey -k 345678, scli describe-key 345678"]
+help_rows << ["dvlan", "describe-vlan, describe-vlans", "Vlan ID (Opt -l)", "scli dvlan -l 345, scli describe-vlan 345"]
+help_rows << ["dadd", "describe-address, describe-addresses", "Address ID (Opt -a)", "scli dadd -a 345313, scli describe-address 345313"]
+help_rows << ["cadd", "create-address", "Location ID (Req -c), Offering ID (Req -o), Vlan ID (Opt -l)", "scli cadd -o 20025212 -c 41 (-l XX)"]
+help_rows << ["daddoff", "describe-address-offerings", "", "scli daddoff, scli describe-address-offerings"]
+help_rows << ["dloc", "describe-location, describe-locations", "Location ID (Opt -c)", "scli dloc -c 345, scli describe-location 345"]
 help_table = Terminal::Table.new :title => "Help", :headings => ["Command", "Aliases", "Arguments", "Examples"], :rows => help_rows
 
 begin
@@ -93,8 +124,12 @@ begin
     require './lib/reboot'
   when 'terminate-instance', 'tin'
     require './lib/terminate-instance'
-  when 'describe-volume', 'describe-volumes', 'dvol'
+  when 'dvol', 'describe-volume', 'describe-volumes'
     require './lib/describe-volume'
+  when 'dvoloff', 'describe-volume-offerings'
+    require './lib/describe-volume-offering'
+  when 'cvol', 'create-volume'
+    require './lib/create-volume'
   when 'attvol', 'attach-volume'
     require './lib/attach-volume'
   when 'detvol', 'detach-volume'
@@ -109,14 +144,20 @@ begin
     require './lib/describe-vlan'
   when 'dadd', 'describe-addresses', 'describe-address'
     require './lib/describe-address'
+  when 'cadd', 'create-address'
+    require './lib/create-address'
+  when 'daddoff', 'describe-address-offerings'
+    require './lib/describe-address-offering'
+  when 'dloc', 'describe-locations', 'describe-location'
+    require './lib/describe-location'
   when 'help'
     puts help_table
     puts "Run scli -h to get command line arguments"
   else
     puts help_table
   end
-rescue Excon::Errors::InternalServerError
-  puts "Got an internal server error while trying to talk to IBM, Retry"
+rescue Excon::Errors::InternalServerError => e
+  puts "Got an internal server error while trying to talk to IBM: #{e.response.body}"
 rescue Excon::Errors::PreconditionFailed => e
   puts "A precondition failed while trying to do our API Request: #{e.response.body}"
 rescue Excon::Errors::SocketError => e
