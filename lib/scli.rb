@@ -1,13 +1,13 @@
-#!/usr/bin/env ruby
-
 require 'rubygems'
 require 'mixlib/cli'
 require 'fog'
 require 'colored'
 require 'terminal-table'
-require './lib/validators'
-require './lib/formatters'
-require './lib/generic'
+require 'validators'
+require 'formatters'
+require 'generic'
+
+PLUGINS = []
 
 class MyCLI
   include Mixlib::CLI
@@ -90,11 +90,6 @@ class MyCLI
 
 end
 
-PLUGINS = []
-
-cli = MyCLI.new
-cli.parse_options
-
 module Scli
   def self.options
     cli = MyCLI.new
@@ -103,43 +98,54 @@ module Scli
   end
 end
 
-Scli.generate_config_file(cli.config[:config_file]) unless Scli.config_file_exists?(cli.config[:config_file])
+module Scli
+  class Main
+    def self.run
+      cli = MyCLI.new
+      cli.parse_options
 
-Dir.glob("./lib/plugins/*").each do |plugin|
-  require plugin
-end
+      Scli.generate_config_file(cli.config[:config_file]) unless Scli.config_file_exists?(cli.config[:config_file])
 
-help_table = Terminal::Table.new :title => "Help", :headings => ["Command", "Aliases", "Arguments", "Examples"], :rows => PLUGINS
+      Dir.glob("#{File.dirname(__FILE__)}/plugins/*").each do |plugin|
+        require plugin
+      end
 
+      help_table = Terminal::Table.new :title => "Help", :headings => ["Command", "Aliases", "Arguments", "Examples"], :rows => PLUGINS
 
-#
-# every array in plugins contains the main command [0], comma seperated command aliases [1], options [2] and examples [3]. So we match on [0] or [1] below.
-#
-begin
-  plugin_executed = false
-  PLUGINS.each do |plugin|
-    commands = [plugin[0]] + plugin[1].split(",")
-    if commands.include?(ARGV[0])
-      Scli.send(plugin[0])
-      plugin_executed = true
+      #
+      # every array in plugins contains the main command [0], comma seperated command aliases [1], options [2] and examples [3]. So we match on [0] or [1] below.
+      #
+      begin
+        plugin_executed = false
+        PLUGINS.each do |plugin|
+          commands = [plugin[0]] + plugin[1].split(",")
+          if commands.include?(ARGV[0])
+            Scli.send(plugin[0])
+            plugin_executed = true
+          end
+        end
+
+        unless plugin_executed || !ARGV[0] == "help"
+        puts help_table
+        puts "\n Run scli -h to get CLI Args"
+        end
+
+      rescue Excon::Errors::InternalServerError => e
+        puts "Got an internal server error while trying to talk to IBM: #{e.response.body}"
+      rescue Excon::Errors::PreconditionFailed => e
+        puts "A precondition failed while trying to do our API Request: #{e.response.body}"
+      rescue Excon::Errors::SocketError => e
+        puts "Could not connect to IBM: #{e}"
+      rescue Excon::Errors::Unauthorized => e
+        puts "You were not authorized to access a resource, Are you sure its owned by the account in your config file? -- #{e.response.body}"
+      rescue Exception => e
+        if e.methods.include?(:response)
+          puts "Fog API Took an exception while speaking to IBM: #{e.response.body}"
+        else
+          puts "Took an exception, You probably put an invalid instance, volume or address id in as a command line argument, Check to make sure it really exists and retry."
+          puts "#{e.backtrace.join("\n")} -- #{e.message}"
+        end
+      end
     end
-  end
-
-  puts help_table + "\n Run scli -h to get CLI Args" unless plugin_executed || !ARGV[0] == "help"
-
-rescue Excon::Errors::InternalServerError => e
-  puts "Got an internal server error while trying to talk to IBM: #{e.response.body}"
-rescue Excon::Errors::PreconditionFailed => e
-  puts "A precondition failed while trying to do our API Request: #{e.response.body}"
-rescue Excon::Errors::SocketError => e
-  puts "Could not connect to IBM: #{e}"
-rescue Excon::Errors::Unauthorized => e
-  puts "You were not authorized to access a resource, Are you sure its owned by the account in your config file? -- #{e.response.body}"
-rescue Exception => e
-  if e.methods.include?(:response)
-    puts "Fog API Took an exception while speaking to IBM: #{e.response.body}"
-  else
-    puts "Took an exception, You probably put an invalid instance, volume or address id in as a command line argument, Check to make sure it really exists and retry."
-    puts "#{e.backtrace.join("\n")} -- #{e.message}"
   end
 end

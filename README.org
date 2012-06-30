@@ -1,0 +1,20 @@
+* Scli
+  scli is a command line tool used to access and interface with IBM SmartCloud. It currently has support for creating, viewing and deleting instances, volumes, keys and addresses, etc.
+
+** Documentation
+  Please run `scli help`
+
+** Contributions
+  Please fork the project, make your commits and do a pull request.
+
+** Configuration
+  ~/.scli/config.rb should contain:
+
+  ibm_username some@gmail.com
+  ibm_password mypassword
+  
+  However if you run the tool without this file present it will prompt you for all the information.
+
+** License
+  Scli is released under the [[https://github.com/sensu/sensu/blob/master/MIT-LICENSE.txt][MIT license]]. Copyright (c) 2012 Sonian Inc
+
