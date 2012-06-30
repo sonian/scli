@@ -1,4 +1,9 @@
 module Scli
+  def self.yield_regular_input(argument)
+    return nil if argument.nil?
+    (argument[0] == "-") ? nil : argument
+  end
+
   def self.is_address_id?(address_id)
     address_id.to_i.to_s.size >= 6
   end

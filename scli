@@ -73,6 +73,12 @@ class MyCLI
     :long => "--format FORMAT",
     :description => "Format to use (ext3, raw)"
 
+  option :private,
+    :short => "-p",
+    :long => "--private",
+    :boolean => true,
+    :description => "Only show private images, etc"
+
   option :help,
     :short => "-h",
     :long => "--help",
@@ -83,6 +89,8 @@ class MyCLI
     :exit => 0
 
 end
+
+PLUGINS = []
 
 cli = MyCLI.new
 cli.parse_options
@@ -97,65 +105,28 @@ end
 
 Scli.generate_config_file(cli.config[:config_file]) unless Scli.config_file_exists?(cli.config[:config_file])
 
-help_rows = []
-help_rows << ["din", "describe-instances, describe-instance", "Instance ID (Opt -i)", "scli din, scli din 123456"]
-help_rows << ["reboot", "", "Instance ID (Req -i)", "scli reboot 123456"]
-help_rows << ["tin", "terminate-instance", "Instance ID (Req -i)", "scli tin 123456"]
-help_rows << ["dvol", "describe-volume, describe-volumes", "Volume ID (Opt -v)", "scli dvol 23456"]
-help_rows << ["dvoloff", "describe-volume-offerings", "", "scli dvoloff"]
-help_rows << ["attvol", "attach-volume", "Volume ID (Req -v), Instance ID (Req -i)", "scli attvol -i 123456 -v 23456"]
-help_rows << ["cvol", "create-volume", "Name (Req -n), Offering ID (Req -o), Format (Req -f), Location ID (Req -c), Size (Req -s)", "scli cvol"]
-help_rows << ["detvol", "detach-volume", "Volume ID (Req -v), Instance ID (Req -i)", "scli detvol -i 123456 -v 23456"]
-help_rows << ["delvol", "delete-volume,terminate-volume", "Volume ID (Req -v)", "scli delvol -v 23456, scli delvol 23456"]
-help_rows << ["dim", "describe-image, describe-images", "Image ID (Opt -m)", "scli dim -m 34567, scli describe-image 34567"]
-help_rows << ["dkey", "describe-key, describe-keys", "Key ID (Opt -k)", "scli dkey -k 345678, scli describe-key 345678"]
-help_rows << ["dvlan", "describe-vlan, describe-vlans", "Vlan ID (Opt -l)", "scli dvlan -l 345, scli describe-vlan 345"]
-help_rows << ["dadd", "describe-address, describe-addresses", "Address ID (Opt -a)", "scli dadd -a 345313, scli describe-address 345313"]
-help_rows << ["cadd", "create-address", "Location ID (Req -c), Offering ID (Req -o), Vlan ID (Opt -l)", "scli cadd -o 20025212 -c 41 (-l XX)"]
-help_rows << ["daddoff", "describe-address-offerings", "", "scli daddoff, scli describe-address-offerings"]
-help_rows << ["dloc", "describe-location, describe-locations", "Location ID (Opt -c)", "scli dloc -c 345, scli describe-location 345"]
-help_table = Terminal::Table.new :title => "Help", :headings => ["Command", "Aliases", "Arguments", "Examples"], :rows => help_rows
+Dir.glob("./lib/plugins/*").each do |plugin|
+  require plugin
+end
 
+help_table = Terminal::Table.new :title => "Help", :headings => ["Command", "Aliases", "Arguments", "Examples"], :rows => PLUGINS
+
+
+#
+# every array in plugins contains the main command [0], comma seperated command aliases [1], options [2] and examples [3]. So we match on [0] or [1] below.
+#
 begin
-  case ARGV[0]
-  when 'describe-instance', 'describe-instances', 'din'
-    require './lib/describe-instance'
-  when 'reboot'
-    require './lib/reboot'
-  when 'terminate-instance', 'tin'
-    require './lib/terminate-instance'
-  when 'dvol', 'describe-volume', 'describe-volumes'
-    require './lib/describe-volume'
-  when 'dvoloff', 'describe-volume-offerings'
-    require './lib/describe-volume-offering'
-  when 'cvol', 'create-volume'
-    require './lib/create-volume'
-  when 'attvol', 'attach-volume'
-    require './lib/attach-volume'
-  when 'detvol', 'detach-volume'
-    require './lib/detach-volume'
-  when 'delvol', 'delete-volume', 'terminate-volume'
-    require './lib/terminate-volume'
-  when 'dim', 'describe-image', 'describe-images'
-    require './lib/describe-image'
-  when 'dkey', 'describe-keys', 'describe-key'
-    require './lib/describe-key'
-  when 'dvlan', 'describe-vlans', 'describe-vlan'
-    require './lib/describe-vlan'
-  when 'dadd', 'describe-addresses', 'describe-address'
-    require './lib/describe-address'
-  when 'cadd', 'create-address'
-    require './lib/create-address'
-  when 'daddoff', 'describe-address-offerings'
-    require './lib/describe-address-offering'
-  when 'dloc', 'describe-locations', 'describe-location'
-    require './lib/describe-location'
-  when 'help'
-    puts help_table
-    puts "Run scli -h to get command line arguments"
-  else
-    puts help_table
+  plugin_executed = false
+  PLUGINS.each do |plugin|
+    commands = [plugin[0]] + plugin[1].split(",")
+    if commands.include?(ARGV[0])
+      Scli.send(plugin[0])
+      plugin_executed = true
+    end
   end
+
+  puts help_table + "\n Run scli -h to get CLI Args" unless plugin_executed || !ARGV[0] == "help"
+
 rescue Excon::Errors::InternalServerError => e
   puts "Got an internal server error while trying to talk to IBM: #{e.response.body}"
 rescue Excon::Errors::PreconditionFailed => e
