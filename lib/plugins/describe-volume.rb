@@ -15,4 +15,4 @@ module Scli
   end
 end
 
-Scli.dvol
+PLUGINS << ["dvol", "describe-volume, describe-volumes", "Volume ID (Opt -v)", "scli dvol 23456"]

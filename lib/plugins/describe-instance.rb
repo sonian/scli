@@ -15,4 +15,4 @@ module Scli
   end
 end
 
-Scli.din
+PLUGINS << ["din", "describe-instances, describe-instance", "Instance ID (Opt -i)", "scli din, scli din 123456"]

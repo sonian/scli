@@ -11,4 +11,4 @@ module Scli
   end
 end
 
-Scli.dvoloff
+PLUGINS << ["dvoloff", "describe-volume-offerings", "", "scli dvoloff"]

@@ -21,4 +21,4 @@ module Scli
   end
 end
 
-Scli.delvol
+PLUGINS << ["delvol", "delete-volume,terminate-volume", "Volume ID (Req -v)", "scli delvol -v 23456, scli delvol 23456"]

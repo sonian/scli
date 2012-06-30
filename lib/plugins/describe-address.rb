@@ -12,4 +12,4 @@ module Scli
   end
 end
 
-Scli.dadd
+PLUGINS << ["dadd", "describe-address, describe-addresses", "Address ID (Opt -a)", "scli dadd -a 345313, scli describe-address 345313"]

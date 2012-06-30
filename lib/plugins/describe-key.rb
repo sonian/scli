@@ -8,4 +8,4 @@ module Scli
   end
 end
 
-Scli.dkey
+PLUGINS << ["dkey", "describe-key, describe-keys", "Key ID (Opt -k)", "scli dkey -k 345678, scli describe-key 345678"]

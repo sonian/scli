@@ -8,4 +8,4 @@ module Scli
   end
 end
 
-Scli.dloc
+PLUGINS << ["dloc", "describe-location, describe-locations", "Location ID (Opt -c)", "scli dloc -c 345, scli describe-location 345"]

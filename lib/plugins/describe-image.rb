@@ -15,4 +15,4 @@ module Scli
   end
 end
 
-Scli.dim
+PLUGINS << ["dim", "describe-image, describe-images", "Image ID (Opt -m)", "scli dim -m 34567, scli describe-image 34567"]

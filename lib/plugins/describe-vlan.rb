@@ -15,4 +15,4 @@ module Scli
   end
 end
 
-Scli.dvlan
+PLUGINS << ["dvlan", "describe-vlan, describe-vlans", "Vlan ID (Opt -l)", "scli dvlan -l 345, scli describe-vlan 345"]

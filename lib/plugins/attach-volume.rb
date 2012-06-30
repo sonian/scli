@@ -1,5 +1,5 @@
 module Scli
-  def self.detvol
+  def self.attvol
     cli = MyCLI.new
     cli.parse_options
     volume_id = cli.config[:volume_id]
@@ -14,16 +14,16 @@ module Scli
       elsif volume.nil?
         puts "Could not find volume: #{volume_id}"
       else
-        if server.detach(volume_id) # Note: detach() takes a string, not an object
+        if server.attach(volume_id.to_i) # Note: attach() takes a string, not an object
           print_volumes(volume)
-          puts "Is being detached from instance:".red
+          puts "Is being attached to instance:".red
           print_servers(server)
         else
-          puts "Volume could not be detached for some reason..."
+          puts "Volume could not be attached for some reason..."
         end
       end
     end
   end
 end
 
-Scli.detvol
+PLUGINS << ["attvol", "attach-volume", "Volume ID (Req -v), Instance ID (Req -i)", "scli attvol -i 123456 -v 23456"]

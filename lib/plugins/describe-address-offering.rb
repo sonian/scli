@@ -11,4 +11,5 @@ module Scli
   end
 end
 
-Scli.daddoff
+PLUGINS << ["daddoff", "describe-address-offerings", "", "scli daddoff, scli describe-address-offerings"]
+

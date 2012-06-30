@@ -1,5 +1,5 @@
 module Scli
-  def self.tin
+  def self.reboot
     cli = MyCLI.new
     cli.parse_options
     instance_id = cli.config[:instance_id] || ARGV[1]
@@ -8,17 +8,16 @@ module Scli
     else
       server = Scli::Compute.new.servers.get(instance_id)
       if server.nil?
-        puts "Could not find server #{instance_id}, please check instance_id and state and retry."
+        puts "Server could not be found, check instance_id and state to ensure it can be rebooted..."
       else
-        if server.destroy
-          print_server(server)
-          puts "Is being destroyed...".red
+        if server.reboot
+          puts "Reboot successful..."
         else
-          puts "Could not destroy server #{instance_id}, please check instance_id and state and retry."
+          puts "Reboot failed, check instance_id and state to ensure it can be rebooted..."
         end
       end
     end
   end
 end
 
-Scli.tin
+PLUGINS << ["reboot", "", "Instance ID (Req -i)", "scli reboot 123456"]
