@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = ['Josh Pasqualetto']
   s.email       = ['josh.pasqualetto@sonian.net']
-  s.homepage    = 'https://github.com/sniperd/scli'
+  s.homepage    = 'https://github.com/sonian/scli'
   s.summary     = 'CLI Interface to IBM SmartCloud API'
   s.description = 'A command line tool to interface with IBM SmartCloud: create, view & delete instances, keys, volumes, addresses, etc'
   s.license     = 'MIT'
