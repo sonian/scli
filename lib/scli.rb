@@ -94,7 +94,7 @@ module Scli
   def self.options
     cli = MyCLI.new
     cli.parse_options
-    cli.config.merge!(read_config(File.expand_path(cli.config[:config_file])))
+    cli.config.merge!(read_config(File.expand_path(cli.config[:config_file])) || {})
   end
 end
 
@@ -104,7 +104,7 @@ module Scli
       cli = MyCLI.new
       cli.parse_options
 
-      Scli.generate_config_file(cli.config[:config_file]) unless Scli.config_file_exists?(cli.config[:config_file])
+      Scli.generate_config_file(cli.config[:config_file]) unless Scli.config_file_exists?(cli.config[:config_file]) || Scli.env_populated?
 
       Dir.glob("#{File.dirname(__FILE__)}/plugins/*").each do |plugin|
         require plugin

@@ -8,6 +8,10 @@
   Please fork the project, make your commits and do a pull request.
 
 ** Configuration
+  You can either set ENV var's (IBM_SC_USERNAME and IBM_SC_PASSWORD)
+
+  OR
+
   ~/.scli/config.rb should contain:
 
   ibm_username some@gmail.com

@@ -3,7 +3,9 @@ module Scli
     def initialize(options={})
         cli_opts = Scli.options
         cli_opts.merge!(options)
-        @fog_compute = Fog::Compute.new(:ibm_username => cli_opts[:ibm_username], :ibm_password => cli_opts[:ibm_password], :provider => 'IBM')
+        ibm_user = (Scli.env_populated?) ? ENV['IBM_SC_USERNAME'] : cli_opts[:ibm_username]
+        ibm_pass = (Scli.env_populated?) ? ENV['IBM_SC_PASSWORD'] : cli_opts[:ibm_password]
+        @fog_compute = Fog::Compute.new(:ibm_username => ibm_user, :ibm_password => ibm_pass, :provider => 'IBM')
     end
 
     def method_missing(method, *args, &block)
@@ -15,7 +17,9 @@ module Scli
     def initialize(options={})
         cli_opts = Scli.options
         cli_opts.merge!(options)
-        @fog_storage = Fog::Storage.new(:ibm_username => cli_opts[:ibm_username], :ibm_password => cli_opts[:ibm_password], :provider => 'IBM')
+        ibm_user = (Scli.env_populated?) ? ENV['IBM_SC_USERNAME'] : cli_opts[:ibm_username]
+        ibm_pass = (Scli.env_populated?) ? ENV['IBM_SC_PASSWORD'] : cli_opts[:ibm_password]
+        @fog_storage = Fog::Storage.new(:ibm_username => ibm_user, :ibm_password => ibm_pass, :provider => 'IBM')
     end
 
     def method_missing(method, *args, &block)
@@ -72,12 +76,20 @@ module Scli
     print_object("Servers", servers, [:id, :name, :ip, :owner, :vlan_id, :volume_ids, :instance_type, :launched_at, :location_id, :state])
   end
 
+
+
+  def self.env_populated?
+    (ENV['IBM_SC_USERNAME'].nil? || ENV['IBM_SC_PASSWORD'].nil?) ? false : (!ENV['IBM_SC_USERNAME'].empty? && !ENV['IBM_SC_PASSWORD'].empty?)
+  end
+
   def self.read_config(config_file_path)
     options = {}
-    config_file = File.open(config_file_path,'r')
-    config_file.each_line do |row|
-      option, data = row.split
-      options[option.to_sym] = data
+    if File.exists?(config_file_path)
+      config_file = File.open(config_file_path,'r')
+      config_file.each_line do |row|
+        option, data = row.split
+        options[option.to_sym] = data
+      end
     end
     options
   end
