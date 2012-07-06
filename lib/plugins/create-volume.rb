@@ -28,4 +28,4 @@ module Scli
   end
 end
 
-PLUGINS << ["cvol", "create-volume", "Name (Req -n), Offering ID (Req -o), Format (Req -f), Location ID (Req -c), Size (Req -s)", "scli cvol"]
+PLUGINS << ["cvol", "create-volume", "Name (Req -n), Offering ID (Req -o), Format (Req -f), Location ID (Req -l), Size (Req -s)", "scli cvol -n 'new_vol' -o 342 -f EXT3 -l 41 -s 1024"]

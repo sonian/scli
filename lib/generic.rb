@@ -76,7 +76,9 @@ module Scli
     print_object("Servers", servers, [:id, :name, :ip, :owner, :vlan_id, :volume_ids, :instance_type, :launched_at, :location_id, :state])
   end
 
-
+  def self.opt_merge(options, name, data)
+    options.merge!({name => data}) unless data.nil?
+  end
 
   def self.env_populated?
     (ENV['IBM_SC_USERNAME'].nil? || ENV['IBM_SC_PASSWORD'].nil?) ? false : (!ENV['IBM_SC_USERNAME'].empty? && !ENV['IBM_SC_PASSWORD'].empty?)

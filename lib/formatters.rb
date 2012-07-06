@@ -66,12 +66,12 @@ module Scli
     instance_type.to_s.split(".").first
   end
 
-  def self.format_image_instance_types(instance_types)
+  def self.format_image_instance_types(instance_types, single = false)
     supported_types = []
     instance_types.each do |it|
-      supported_types << format_type(it.id)
+      supported_types << ((single) ? it.id : format_type(it.id))
     end
-    supported_types.join(",")
+    (single ? supported_types.join("\n") : supported_types.join(","))
   end
 
   def self.format_size(vol_size)
@@ -108,7 +108,7 @@ module Scli
       when /state/
         format_state(object.send(data))
       when /supported_instance_types/
-        format_image_instance_types(object.send(data))
+        single ? format_image_instance_types(object.send(data), true) : format_image_instance_types(object.send(data))
       when /capabilities/
         single ? format_capabilities(object.send(data), true) : format_capabilities(object.send(data))
       when /default/

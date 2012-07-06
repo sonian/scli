@@ -21,7 +21,7 @@ class MyCLI
   option :address_id,
     :short => "-a ADDRESS",
     :long => "--address-id ADDRESS",
-    :description => "Address ID to use"
+    :description => "IP Address ID to use"
 
   option :instance_id,
     :short => "-i INSTANCE",
@@ -32,6 +32,11 @@ class MyCLI
     :short => "-v VOLUME",
     :long => "--volume-id VOLUME",
     :description => "Volume ID to use"
+
+  option :instance_type,
+    :short => "-t TYPE",
+    :long => "--instance-type TYPE",
+    :description => "Instance Type (e.g. COP32.1/2048/60)"
 
   option :image_id,
     :short => "-m IMAGE",
@@ -49,12 +54,12 @@ class MyCLI
     :description => "Offering ID to use"
 
   option :vlan_id,
-    :short => "-l VLAN",
+    :short => "-V VLAN",
     :long => "--vlan-id VLAN",
     :description => "Vlan ID to use"
 
   option :location_id,
-    :short => "-c LOCATION",
+    :short => "-l LOCATION",
     :long => "--location-id LOCATION",
     :description => "Location ID to use"
 
@@ -78,6 +83,24 @@ class MyCLI
     :long => "--private",
     :boolean => true,
     :description => "Only show private images, etc"
+
+  option :mini_ephemeral,
+    :long => "--mini",
+    :boolean => true,
+    :description => "(Create instance only) Set mini ephemeral)"
+
+  option :configuration_data,
+    :long => "--config-data DATA",
+    :description => "(Create instance only) Extra config data required by image"
+
+  option :anti_colo,
+    :long => "--anti-colo INST_ID",
+    :description => "(Create instance only) Instance ID to anti-colo against"
+
+  option :secondary_address_id,
+    :short => "-A SADDRESS",
+    :long => "--secondary-address-id SADDRESS",
+    :description => "(Create instance only) IP To use for eth1"
 
   option :help,
     :short => "-h",

@@ -19,4 +19,4 @@ module Scli
   end
 end
 
-PLUGINS << ["cadd", "create-address", "Location ID (Req -c), Offering ID (Req -o), Vlan ID (Opt -l)", "scli cadd -o 20025212 -c 41 (-l XX)"]
+PLUGINS << ["cadd", "create-address", "Location ID (Req -l), Offering ID (Req -o), Vlan ID (Opt -V)", "scli cadd -o 20025212 -l 41 (-V XX)"]
