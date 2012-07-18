@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'scli'
-  s.version     = '0.0.3'
+  s.version     = '0.0.4'
   s.date        = '2012-06-30'
   s.platform    = Gem::Platform::RUBY
   s.authors     = ['Josh Pasqualetto']
