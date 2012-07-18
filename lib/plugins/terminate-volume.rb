@@ -11,7 +11,7 @@ module Scli
         puts "Could not find volume: #{volume_id}"
       else
         if volume.destroy
-          print_volume(volume)
+          print_volumes(volume)
           puts "Is being destroyed...".red
         else
           puts "Volume could not be destroyed for some reason..."
