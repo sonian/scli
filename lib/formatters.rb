@@ -18,7 +18,11 @@ module Scli
     when "Requesting", "Provisioning", "New"
       state.yellow
     else
-      state.red
+      if state.nil?
+        "Nil".red
+      else
+        state.red
+      end
     end
   end
 
