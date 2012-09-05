@@ -76,7 +76,7 @@ class MyCLI
   option :format,
     :short => "-f FORMAT",
     :long => "--format FORMAT",
-    :description => "Format to use (ext3, raw)"
+    :description => "Format to use (EXT3, RAW)"
 
   option :private,
     :short => "-p",
