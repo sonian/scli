@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'scli'
-  s.version     = '0.0.5'
-  s.date        = '2012-06-30'
+  s.version     = '0.0.6'
+  s.date        = '2012-11-20'
   s.platform    = Gem::Platform::RUBY
   s.authors     = ['Josh Pasqualetto']
   s.email       = ['josh.pasqualetto@sonian.net']
@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.license     = 'MIT'
   s.has_rdoc    = false
 
-  s.add_dependency('fog', '~> 1.3.1')
+  s.add_dependency('fog', '~> 1.7.0')
   s.add_dependency('mixlib-cli', '~> 1.2.2')
   s.add_dependency('terminal-table', '~> 1.4.5')
   s.add_dependency('colored', '1.2')
