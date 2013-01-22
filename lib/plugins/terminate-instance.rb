@@ -11,7 +11,7 @@ module Scli
         puts "Could not find server #{instance_id}, please check instance_id and state and retry."
       else
         if server.destroy
-          print_server(server)
+          print_servers(server)
           puts "Is being destroyed...".red
         else
           puts "Could not destroy server #{instance_id}, please check instance_id and state and retry."
