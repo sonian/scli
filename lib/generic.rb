@@ -47,7 +47,7 @@ module Scli
 
   def self.print_object(title, objects, data_to_print, options = {})
     table_to_print = []
-    if objects.methods.include?(:each) # Its not a single object
+    if objects.respond_to?('each') # Its not a single object
       title = title + "(#{objects.count})"
       objects.each do |object|
         table_to_print << process_data_to_format(object, data_to_print)
@@ -68,7 +68,7 @@ module Scli
         next if vol.size.nil?
         total_vol_size += vol.size.to_i
       end
-      puts "Total #{(total_vol_size.to_i / 1024.0).round(2)}Tb of storage"
+      puts "Total #{(total_vol_size.to_i / 1024.0).round / 1.0}Tb of storage"
     end
   end
 

@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'scli'
-  s.version     = '0.0.7'
-  s.date        = '2012-11-20'
+  s.version     = '0.0.8'
+  s.date        = '2013-01-24'
   s.platform    = Gem::Platform::RUBY
   s.authors     = ['Josh Pasqualetto']
   s.email       = ['josh.pasqualetto@sonian.net']

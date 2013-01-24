@@ -141,6 +141,7 @@ module Scli
       begin
         plugin_executed = false
         PLUGINS.each do |plugin|
+          next if plugin == :separator
           commands = [plugin[0]] + plugin[1].split(",")
           if commands.include?(ARGV[0])
             Scli.send(plugin[0])
